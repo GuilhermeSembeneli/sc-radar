@@ -2,6 +2,7 @@
 --VARIABLES
 ---------------------------------------------------------------------------------------------------------
 local ped = PlayerPedId()
+local pedtwo = PlayerPedId(-1)
 local time = false
 ---------------------------------------------------------------------------------------------------------
 --THREAD
@@ -13,7 +14,7 @@ Citizen.CreateThread(function()
         local position = GetEntityCoords(ped)
         veh = GetVehiclePedIsIn(ped)
         if IsEntityAVehicle(veh) then
-            if GetPedInVehicleSeat(veh, -1) then
+            if GetPedInVehicleSeat(veh, -1) == pedtwo then
                 for k,v in pairs(SCconfig.Radar) do
                     local distance = GetDistanceBetweenCoords(position, vector3(v.x, v.y, v.z), true)
                     if distance < 55 then
@@ -25,7 +26,7 @@ Citizen.CreateThread(function()
                     if distance < v.distance then 
                         ScTime = 1
                         if speed >= v.speed then
-                            drawTxt("~p~Limite de velocidade ultrapassado!~w~",4,0.08,0.75,0.38,255,255,255,255)
+                            drawTxt("~p~Limite de velocidade ultrapassada!~w~",4,0.08,0.75,0.38,255,255,255,255)
                             if not time then
                                 PlaySoundFrontend( -1, "ATM_WINDOW", "HUD_FRONTEND_DEFAULT_SOUNDSET", true );
                                 TriggerServerEvent("sc:payment:radar", v.pay)
@@ -38,33 +39,24 @@ Citizen.CreateThread(function()
                     end
                 end
             end
-        else
-        ScTime = 5000
-        RemoveBlip(blip)
         end
         Citizen.Wait(ScTime)
     end
 end)
 
 
+
 Citizen.CreateThread(function()
-    while true do 
-        Citizen.Wait(1000)
-        if not DoesBlipExist(blip) then
-            if  IsEntityAVehicle(veh) then
-                for k,v in pairs(SCconfig.Radar) do
-                    blip = AddBlipForCoord(v.x, v.y, v.z)
-                    SetBlipSprite(blip, v.id)
-                    SetBlipColour(blip, v.color)
-                    SetBlipScale(blip, v.scale)
-                    SetBlipAsShortRange(blip, true)
-                    BeginTextCommandSetBlipName("STRING");
-                    AddTextComponentString(v.name)
-                    EndTextCommandSetBlipName(blip)
-                end
-            end
-        end
-    end 
+    for k,v in pairs(SCconfig.Radar) do
+            blip = AddBlipForCoord(v.x, v.y, v.z)
+            SetBlipSprite(blip, v.id)
+            SetBlipColour(blip, v.color)
+            SetBlipScale(blip, v.scale)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName("STRING");
+            AddTextComponentString(v.name)
+            EndTextCommandSetBlipName( blip)
+    end
 end)
 
 ---------------------------------------------------------------------------------------------------------
